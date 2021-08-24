@@ -1,0 +1,3 @@
+name: metaverse
+version: ${version}
+main: me.cragon.metaverse.plugin.MetaversePlugin
