@@ -17,7 +17,6 @@ if [ ! -f "$server_folder/$start_script" ]; then
     cp ".server/$start_script" "$server_folder/$start_script"
   else
     wget -qc -P "$server_folder" -N "https://raw.githubusercontent.com/monun/server-script/master/.server/$start_script"
-    wget -qc -P "$server_folder" -N "https://raw.githubusercontent.com/monun/server-script/master/.server/start.bat"
   fi
 fi
 
