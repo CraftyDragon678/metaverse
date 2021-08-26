@@ -1,6 +1,7 @@
 name: metaverse
 version: $version
 main: me.cragon.metaverse.plugin.MetaversePlugin
+api-version: 1.17
 libraries:
   - io.github.monun:tap:4.1.2
   - io.github.monun:kommand:2.6.5
