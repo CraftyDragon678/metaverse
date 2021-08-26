@@ -4,6 +4,3 @@ main: me.cragon.metaverse.plugin.MetaversePlugin
 libraries:
   - io.github.monun:tap:4.1.2
   - io.github.monun:kommand:2.6.5
-commands:
-  mv:
-    description: metaverse
