@@ -19,6 +19,7 @@ subprojects {
 
         implementation(kotlin("stdlib"))
         implementation("io.github.monun:tap-api:4.1.2")
+        implementation("io.github.monun:kommand-api:2.6.5")
     }
 }
 
