@@ -6,7 +6,8 @@ import org.bukkit.scheduler.BukkitTask
 class Metaverse(private val plugin: MetaversePlugin) {
     private var task: BukkitTask? = null
     fun startTask() {
-        task = plugin.server.scheduler.runTaskTimer(plugin, MetaverseTask(), 0L, 1L)
+        if (task != null) return
+        task = MetaverseTask().runTaskTimer(plugin, 0L, 1L)
     }
 
     fun stopTask() {
