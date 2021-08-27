@@ -3,10 +3,9 @@ package me.cragon.metaverse
 import io.github.monun.tap.fake.FakeEntityServer
 import me.cragon.metaverse.plugin.MetaversePlugin
 import org.bukkit.Bukkit
-import org.bukkit.scheduler.BukkitTask
 
 class Metaverse(private val plugin: MetaversePlugin) {
-    private var task: BukkitTask? = null
+    private var task: MetaverseTask? = null
     val fakeEntityServer by lazy {
         val fes = FakeEntityServer.create(plugin)
         Bukkit.getOnlinePlayers().forEach {
@@ -17,7 +16,8 @@ class Metaverse(private val plugin: MetaversePlugin) {
 
     fun startTask() {
         if (task != null) return
-        task = MetaverseTask().runTaskTimer(plugin, 0L, 1L)
+        task = MetaverseTask()
+        task!!.runTaskTimer(plugin, 0L, 1L)
     }
 
     fun stopTask() {
