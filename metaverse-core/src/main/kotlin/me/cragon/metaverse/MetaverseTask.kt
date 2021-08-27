@@ -5,7 +5,7 @@ import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.scheduler.BukkitRunnable
 
-const val MAX_TICK = 6000
+const val MAX_TICK = 3 * 60 * 20
 
 class MetaverseTask: BukkitRunnable() {
     private var tick = 0
