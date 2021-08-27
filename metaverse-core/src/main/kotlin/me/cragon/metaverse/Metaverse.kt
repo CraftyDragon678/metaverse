@@ -6,12 +6,12 @@ import org.bukkit.Bukkit
 
 class Metaverse(private val plugin: MetaversePlugin) {
     private var task: MetaverseTask? = null
-    val fakeEntityServer by lazy {
-        val fes = FakeEntityServer.create(plugin)
+    val fakeEntityServer: FakeEntityServer = FakeEntityServer.create(plugin)
+
+    init {
         Bukkit.getOnlinePlayers().forEach {
-            fes.addPlayer(it)
+            fakeEntityServer.addPlayer(it)
         }
-        fes
     }
 
     fun startTask() {
