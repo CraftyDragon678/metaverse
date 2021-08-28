@@ -1,27 +1,39 @@
 package me.cragon.metaverse
 
 import io.github.monun.tap.fake.FakeEntityServer
+import io.github.monun.tap.fake.FakeProjectileManager
 import me.cragon.metaverse.plugin.MetaversePlugin
 import org.bukkit.Bukkit
 
-class Metaverse(private val plugin: MetaversePlugin) {
-    private var task: MetaverseTask? = null
-    val fakeEntityServer: FakeEntityServer = FakeEntityServer.create(plugin)
+object Metaverse {
+    lateinit var plugin: MetaversePlugin
+        private set
 
-    init {
-        Bukkit.getOnlinePlayers().forEach {
-            fakeEntityServer.addPlayer(it)
-        }
+    lateinit var fakeEntityServer: FakeEntityServer
+        private set
+
+    lateinit var fakeProjectileManager: FakeProjectileManager
+
+    internal fun initialize(plugin: MetaversePlugin, fakeEntityServer: FakeEntityServer, fakeProjectileManager: FakeProjectileManager) {
+        this.plugin = plugin
+        this.fakeEntityServer = fakeEntityServer
+        this.fakeProjectileManager = fakeProjectileManager
     }
 
-    fun startTask() {
-        if (task != null) return
+    private var task: MetaverseTask? = null
+
+
+    fun startTask(): Boolean {
+        if (task != null) return false
         task = MetaverseTask()
         task!!.runTaskTimer(plugin, 0L, 1L)
+        return true
     }
 
-    fun stopTask() {
+    fun stopTask(): Boolean {
+        if (task == null) return false
         task?.cancel()
         task = null
+        return true
     }
 }

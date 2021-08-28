@@ -2,9 +2,11 @@ package me.cragon.metaverse.command
 
 import io.github.monun.kommand.KommandSource
 import io.github.monun.kommand.PluginKommand
+import me.cragon.metaverse.Metaverse
 import me.cragon.metaverse.plugin.MetaversePlugin
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextDecoration
 
 class KommandMetaverse {
     private lateinit var plugin: MetaversePlugin
@@ -23,16 +25,29 @@ class KommandMetaverse {
                     stop()
                 }
             }
+            then("test") {
+                executes {
+                    feedback(Component.text("test"))
+                }
+            }
         }
     }
 
     private fun KommandSource.start() {
-        plugin.metaverse.startTask()
-        feedback(Component.text("start").color(NamedTextColor.GREEN))
+        if (Metaverse.startTask()) {
+            broadcast(Component.text("start").color(NamedTextColor.GREEN))
+        } else {
+            feedback(Component.text().content("metaverse is currently running")
+                .color(NamedTextColor.RED).decorate(TextDecoration.ITALIC))
+        }
     }
 
     private fun KommandSource.stop() {
-        plugin.metaverse.stopTask()
-        feedback(Component.text("end").color(NamedTextColor.RED))
+        if (Metaverse.stopTask()) {
+            broadcast(Component.text("end").color(NamedTextColor.RED))
+        } else {
+            feedback(Component.text().content("metaverse not running")
+                .color(NamedTextColor.RED).decorate(TextDecoration.ITALIC))
+        }
     }
 }
