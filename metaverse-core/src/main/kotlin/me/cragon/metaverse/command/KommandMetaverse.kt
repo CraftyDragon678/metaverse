@@ -26,6 +26,9 @@ class KommandMetaverse {
                         start(sceneNumber)
                     }
                 }
+                executes {
+                    feedback(Component.text("Please specify scene number").color(NamedTextColor.RED))
+                }
             }
             then("stop") {
                 executes {
@@ -43,6 +46,10 @@ class KommandMetaverse {
                         val skinName: MetaverseSkin by it
                         setJoinSkin(skinName)
                     }
+                }
+                executes {
+                    feedback(Component.text("Please specify skin name: one of the ").color(NamedTextColor.RED)
+                        .append(Component.text(MetaverseSkin.values().joinToString(", ")).color(NamedTextColor.GREEN)))
                 }
             }
         }
