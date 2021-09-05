@@ -3,7 +3,10 @@ package me.cragon.metaverse.tasks
 import io.github.monun.tap.fake.FakeEntity
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.text.Component
+import net.minecraft.network.protocol.game.PacketPlayOutEntity
 import net.minecraft.network.protocol.game.PacketPlayOutEntityDestroy
+import net.minecraft.network.protocol.game.PacketPlayOutEntityHeadRotation
+import net.minecraft.network.protocol.game.PacketPlayOutNamedEntitySpawn
 import net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo
 import net.minecraft.server.level.EntityPlayer
 import org.bukkit.Bukkit
@@ -48,6 +51,23 @@ abstract class TaskBase: BukkitRunnable() {
         }
 
         super.cancel()
+    }
+
+    protected fun updateNpc() {
+        runAllPlayers {
+            val connection = (it as CraftPlayer).handle.b
+            npcs.forEach { npc ->
+                connection.sendPacket(PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.a,
+                    npc))
+                connection.sendPacket(PacketPlayOutNamedEntitySpawn(npc))
+                connection.sendPacket(PacketPlayOutEntityHeadRotation(npc,
+                    (npc.yRot / 256 * 360).toInt().toByte()))
+                connection.sendPacket(PacketPlayOutEntity.PacketPlayOutEntityLook(npc.id,
+                    (npc.yRot / 256 * 360).toInt().toByte(),
+                    (npc.xRot / 256 * 360).toInt().toByte(),
+                    true))
+            }
+        }
     }
 
     companion object {
