@@ -1,8 +1,9 @@
 package me.cragon.metaverse.internal
 
 import com.destroystokyo.paper.profile.ProfileProperty
+import com.mojang.authlib.properties.Property
 
-enum class MetaverseSkin(private val skin: String, private val signature: String) {
+enum class MetaverseSkin(skin: String, signature: String) {
     /** 크레곤 */
     ME(
         "ewogICJ0aW1lc3RhbXAiIDogMTYzMDc0ODE2MDc3NywKICAicHJvZmlsZUlkIiA6ICJiMDYxM2E4MDVlZjI0ZGE2ODdmNjJiMWIxMGM1YWFlNiIsCiAgInByb2ZpbGVOYW1lIiA6ICJDcmFmdHlEcmFnb242NzgiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjk3OTNkNjdjYjk1YzAyMmFjZTg2NzFlNTQ1ODdmMjlmOTlkYTk2OTYzZjUzNWJmOGU2ZTdjODg0NDk3ZWU2YSIKICAgIH0KICB9Cn0=",
@@ -32,7 +33,7 @@ enum class MetaverseSkin(private val skin: String, private val signature: String
         "JKg21SJ+vWpgVOhTLKhgarX0J+8lSoCOfhxD9Tq0ZehAdD0l/kLi7GXYzt8JuEqgH73jGQoKv25DjH/GxW/+WtDiO0uPu9Qcj1WQ6YzGV0su2zOvSH+G2WK7PqqzU7LEYTNXHSkV25WR2x1MJxJ8JQ8N/K4d6+TqOLIabjcdc5qwUHXXZA6yS4pss6K/bK9JiPPkugii00+SpjfMNYvlQtOFqEMjDOTC307B7jfECsKzDXB5ZrbR5e0684JfoN4snsVzKoHXIinm7qi4wiAnqXQXK3nJmufRhYQw4LdcQOtmmTsZyNvd6V0zItsNo5yvJPAWN0xyWndWuUPsjOZnCZlBnVNnzB/LZPjgfNh1M4JWSswfjS9GLPpEczHbscNonJWDrypbw9/C3y1miI9tcT4dcvx/qiTebNNXwKTM+q3wYE4JSUHgEgkl3dxhEK6ff8fdfoDmovANSkPGj+CBrdVcerEmtzD/qLNMdp437n/YwiUWayhmho9+iY42GYqIhC15WL/WWhA7fqW8oCD+fgAGOzuBxA6zY3LTncEwwac1G0/6xEkrOI47OUzHd974dVf3ANuc0/vTsehquwDTmO+o4farEp+zUPYFTMkSV+sJ22NOyv+zahyztZVrQshoAVnTOKJTZoCvTp5hMZYcOMOgNsqi8hCbAtkzfdH6ErA=",
     );
 
-    fun makeProperty(): ProfileProperty {
-        return ProfileProperty("texture", skin, signature)
-    }
+    val property = Property("texture", skin, signature)
+
+    val profileProperty = ProfileProperty("texture", skin, signature)
 }

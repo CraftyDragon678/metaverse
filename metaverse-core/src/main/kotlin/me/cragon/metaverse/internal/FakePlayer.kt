@@ -11,9 +11,9 @@ import org.bukkit.craftbukkit.v1_17_R1.CraftWorld
 import java.util.*
 
 object FakePlayer {
-     fun spawnFakePlayer(name: String, loc: Location, skin: String, signature: String): EntityPlayer {
+     fun spawnFakePlayer(name: String, loc: Location, skin: MetaverseSkin): EntityPlayer {
         val profile = GameProfile(UUID.randomUUID(), name)
-        profile.properties.put("textures", Property("textures", skin, signature))
+        profile.properties.put("textures", skin.property)
         val server = (Bukkit.getServer() as CraftServer).server
         val world = (Metaverse.mainWorld as CraftWorld).handle
         val npc = EntityPlayer(server, world, profile)
