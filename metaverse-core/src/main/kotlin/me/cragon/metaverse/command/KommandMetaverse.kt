@@ -41,7 +41,7 @@ class KommandMetaverse {
                 then("skinName" to dynamicByEnum(EnumSet.allOf(MetaverseSkin::class.java))) {
                     executes {
                         val skinName: MetaverseSkin by it
-                        Metaverse.joinSkin = skinName
+                        setJoinSkin(skinName)
                     }
                 }
             }
@@ -75,5 +75,11 @@ class KommandMetaverse {
         else {
             feedback(Component.text("test").color(NamedTextColor.GRAY))
         }
+    }
+
+    private fun KommandSource.setJoinSkin(skin: MetaverseSkin) {
+        Metaverse.joinSkin = skin
+        feedback(Component.text().content("join skin is set: ")
+            .append(Component.text().content(skin.name).color(NamedTextColor.GREEN)))
     }
 }
