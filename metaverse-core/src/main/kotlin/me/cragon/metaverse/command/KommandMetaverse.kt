@@ -6,6 +6,7 @@ import io.github.monun.kommand.getValue
 import me.cragon.metaverse.Metaverse
 import me.cragon.metaverse.internal.MetaverseSkin
 import me.cragon.metaverse.plugin.MetaversePlugin
+import me.cragon.metaverse.tasks.TaskBase
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
@@ -19,8 +20,11 @@ class KommandMetaverse {
         kommand.register("metaverse", "mv") {
             permission("metaverse.commands")
             then("start") {
-                executes {
-                    start()
+                then("sceneNumber" to int(1)) {
+                    executes {
+                        val sceneNumber: Int by it
+                        start(sceneNumber)
+                    }
                 }
             }
             then("stop") {
@@ -44,11 +48,15 @@ class KommandMetaverse {
         }
     }
 
-    private fun KommandSource.start() {
-        if (Metaverse.startTask()) {
+    private fun KommandSource.start(sceneNumber: Int) {
+        val task = TaskBase.getScene(sceneNumber)?.getDeclaredConstructor()?.newInstance()
+        if (task == null) {
+            feedback(Component.text().content("can't find scene")
+                .color(NamedTextColor.RED).decorate(TextDecoration.ITALIC))
+        } else if (Metaverse.startTask(task)) {
             broadcast(Component.text("start").color(NamedTextColor.GREEN))
         } else {
-            feedback(Component.text().content("metaverse is currently running")
+            return feedback(Component.text().content("metaverse is currently running")
                 .color(NamedTextColor.RED).decorate(TextDecoration.ITALIC))
         }
     }

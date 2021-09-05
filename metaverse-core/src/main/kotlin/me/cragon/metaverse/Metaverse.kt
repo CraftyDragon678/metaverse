@@ -4,6 +4,7 @@ import io.github.monun.tap.fake.FakeEntityServer
 import io.github.monun.tap.fake.FakeProjectileManager
 import me.cragon.metaverse.internal.MetaverseSkin
 import me.cragon.metaverse.plugin.MetaversePlugin
+import me.cragon.metaverse.tasks.TaskBase
 import org.bukkit.Bukkit
 import org.bukkit.World
 
@@ -29,13 +30,12 @@ object Metaverse {
         joinSkin = MetaverseSkin.ME
     }
 
-    private var task: MetaverseTask? = null
+    private var task: TaskBase? = null
 
-
-    fun startTask(): Boolean {
-        if (task != null) return false
-        task = MetaverseTask()
-        task!!.runTaskTimer(plugin, 0L, 1L)
+    fun startTask(task: TaskBase): Boolean {
+        if (this.task != null) return false
+        this.task = task
+        task.runTaskTimer(plugin, 0L, 1L)
         return true
     }
 

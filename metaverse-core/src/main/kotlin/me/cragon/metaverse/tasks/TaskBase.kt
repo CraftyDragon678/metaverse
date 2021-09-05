@@ -54,7 +54,7 @@ abstract class TaskBase: BukkitRunnable() {
         @JvmStatic
         private val bossBar = BossBar.bossBar(Component.text("0:00"),  0f, BossBar.Color.GREEN, BossBar.Overlay.NOTCHED_10)
 
-        fun getScene(sceneNumber: Number): Class<out TaskBase>? {
+        fun getScene(sceneNumber: Int): Class<out TaskBase>? {
             return try {
                 Class.forName("${TaskBase::class.java.packageName}.Scene$sceneNumber").asSubclass(TaskBase::class.java)
             } catch (e: ClassNotFoundException) {
