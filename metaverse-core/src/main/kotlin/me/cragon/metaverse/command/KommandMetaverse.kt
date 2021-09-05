@@ -2,11 +2,14 @@ package me.cragon.metaverse.command
 
 import io.github.monun.kommand.KommandSource
 import io.github.monun.kommand.PluginKommand
+import io.github.monun.kommand.getValue
 import me.cragon.metaverse.Metaverse
+import me.cragon.metaverse.internal.MetaverseSkin
 import me.cragon.metaverse.plugin.MetaversePlugin
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
+import java.util.*
 
 class KommandMetaverse {
     private lateinit var plugin: MetaversePlugin
@@ -27,7 +30,15 @@ class KommandMetaverse {
             }
             then("test") {
                 executes {
-                    feedback(Component.text("test"))
+                    test()
+                }
+            }
+            then("skin")  {
+                then("skinName" to dynamicByEnum(EnumSet.allOf(MetaverseSkin::class.java))) {
+                    executes {
+                        val skinName: MetaverseSkin by it
+                        Metaverse.joinSkin = skinName
+                    }
                 }
             }
         }
@@ -48,6 +59,13 @@ class KommandMetaverse {
         } else {
             feedback(Component.text().content("metaverse not running")
                 .color(NamedTextColor.RED).decorate(TextDecoration.ITALIC))
+        }
+    }
+
+    private fun KommandSource.test() {
+        if (!isPlayer) feedback(Component.text("only for player").color(NamedTextColor.RED))
+        else {
+            feedback(Component.text("test").color(NamedTextColor.GRAY))
         }
     }
 }

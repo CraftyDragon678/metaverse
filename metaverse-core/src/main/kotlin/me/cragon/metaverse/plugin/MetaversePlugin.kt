@@ -5,7 +5,6 @@ import io.github.monun.tap.fake.FakeEntityServer
 import io.github.monun.tap.fake.FakeProjectileManager
 import me.cragon.metaverse.Metaverse
 import me.cragon.metaverse.command.KommandMetaverse
-import me.cragon.metaverse.internal.MetaverseSkin
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -45,7 +44,7 @@ class MetaversePlugin: JavaPlugin(), Listener {
 
     @EventHandler
     fun onPlayerPreJoin(e: AsyncPlayerPreLoginEvent) {
-        e.playerProfile.setProperty(MetaverseSkin.ME.makeProperty())
+        e.playerProfile.setProperty(Metaverse.joinSkin.makeProperty())
     }
 
     @EventHandler
@@ -58,7 +57,57 @@ class MetaversePlugin: JavaPlugin(), Listener {
         fakeEntityServer.removePlayer(e.player)
     }
 
-    override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
-        return false
-    }
+//    @EventHandler
+//    fun onPlayerInteract(e: PlayerInteractEvent) {
+//        if (e.action == Action.LEFT_CLICK_AIR && e.item?.type == Material.LIGHT_BLUE_STAINED_GLASS) {
+//            val projectile = Projectile().apply {
+//                projectile = fakeEntityServer.spawnEntity(e.player.eyeLocation, ArmorStand::class.java).apply {
+//                    updateMetadata<ArmorStand> {
+//                        isVisible = false
+//                        isMarker = true
+//                    }
+//                    updateEquipment {
+//                        helmet = ItemStack(Material.LIGHT_BLUE_STAINED_GLASS)
+//                    }
+//                }
+//                velocity = e.player.eyeLocation.direction
+//            }
+//            fakeProjectileManager.launch(e.player.eyeLocation, projectile)
+//        }
+//    }
+//
+//    inner class Projectile: FakeProjectile(1200, 128.0) {
+//        lateinit var projectile: FakeEntity
+//
+//        override fun onPreUpdate() {
+//            velocity = velocity.apply { y -= 0.05 }
+//        }
+//
+//        override fun onMove(movement: Movement) {
+//            projectile.moveTo(movement.to.clone().apply { y -= 1.62 })
+//        }
+//
+//        override fun onTrail(trail: Trail) {
+//            trail.velocity?.let { v ->
+//                val length = v.normalizeAndLength()
+//                if (length > 0.0) {
+//                    val start = trail.from
+//                    val world = start.world
+//
+//                    world.rayTrace(start, v, length, FluidCollisionMode.NEVER, true, 1.0) { false }?.let {
+//                        remove()
+//                    }
+//                }
+//            }
+//        }
+//
+//        override fun onRemove() {
+//            projectile.remove()
+//        }
+//    }
+//
+//    @EventHandler
+//    fun onBlockChange(e: EntityBlockFormEvent) {
+//        println(e.block.type.name)
+//    }
 }
