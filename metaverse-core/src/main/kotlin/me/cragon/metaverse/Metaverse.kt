@@ -4,6 +4,7 @@ import io.github.monun.tap.fake.FakeEntityServer
 import io.github.monun.tap.fake.FakeProjectileManager
 import me.cragon.metaverse.plugin.MetaversePlugin
 import org.bukkit.Bukkit
+import org.bukkit.World
 
 object Metaverse {
     lateinit var plugin: MetaversePlugin
@@ -14,10 +15,14 @@ object Metaverse {
 
     lateinit var fakeProjectileManager: FakeProjectileManager
 
+    lateinit var mainWorld: World
+        private set
+
     internal fun initialize(plugin: MetaversePlugin, fakeEntityServer: FakeEntityServer, fakeProjectileManager: FakeProjectileManager) {
         this.plugin = plugin
         this.fakeEntityServer = fakeEntityServer
         this.fakeProjectileManager = fakeProjectileManager
+        mainWorld = Bukkit.getWorlds().first()
     }
 
     private var task: MetaverseTask? = null
