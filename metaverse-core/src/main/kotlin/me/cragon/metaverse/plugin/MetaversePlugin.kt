@@ -1,15 +1,15 @@
 package me.cragon.metaverse.plugin
 
-import io.github.monun.kommand.PluginKommand
 import io.github.monun.kommand.kommand
+import io.github.monun.tap.fake.FakeEntityServer
+import io.github.monun.tap.fake.FakeProjectileManager
 import me.cragon.metaverse.Metaverse
-import me.cragon.metaverse.MetaverseTask
 import me.cragon.metaverse.command.KommandMetaverse
-import org.bukkit.command.Command
-import org.bukkit.command.CommandExecutor
-import org.bukkit.command.CommandSender
+import me.cragon.metaverse.internal.MetaverseSkin
+import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.java.JavaPlugin
@@ -41,6 +41,11 @@ class MetaversePlugin: JavaPlugin(), Listener {
         Metaverse.stopTask()
         fakeEntityServer.shutdown()
         fakeProjectileManager.clear()
+    }
+
+    @EventHandler
+    fun onPlayerPreJoin(e: AsyncPlayerPreLoginEvent) {
+        e.playerProfile.setProperty(MetaverseSkin.ME.makeProperty())
     }
 
     @EventHandler
