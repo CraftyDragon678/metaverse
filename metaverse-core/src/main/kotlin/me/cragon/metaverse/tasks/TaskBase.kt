@@ -1,5 +1,7 @@
 package me.cragon.metaverse.tasks
 
+import com.comphenix.protocol.PacketType
+import com.comphenix.protocol.events.PacketContainer
 import io.github.monun.tap.fake.FakeEntity
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.text.Component
@@ -45,6 +47,7 @@ abstract class TaskBase: BukkitRunnable() {
                 connection.sendPacket(PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.e, npc))
                 connection.sendPacket(PacketPlayOutEntityDestroy(npc.id))
             }
+            it.hideBossBar(bossBar)
         }
         armorStands.forEach {
             it.remove()
@@ -55,16 +58,17 @@ abstract class TaskBase: BukkitRunnable() {
 
     protected fun updateNpc() {
         runAllPlayers {
+            PacketContainer(PacketType.Play.Server.PLAYER_INFO)
             val connection = (it as CraftPlayer).handle.b
             npcs.forEach { npc ->
                 connection.sendPacket(PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.a,
                     npc))
                 connection.sendPacket(PacketPlayOutNamedEntitySpawn(npc))
                 connection.sendPacket(PacketPlayOutEntityHeadRotation(npc,
-                    (npc.yRot / 256 * 360).toInt().toByte()))
+                    ((npc.yRot * 256) / 360).toInt().toByte()))
                 connection.sendPacket(PacketPlayOutEntity.PacketPlayOutEntityLook(npc.id,
-                    (npc.yRot / 256 * 360).toInt().toByte(),
-                    (npc.xRot / 256 * 360).toInt().toByte(),
+                    ((npc.yRot * 256) / 360).toInt().toByte(),
+                    ((npc.xRot * 256) / 360).toInt().toByte(),
                     true))
             }
         }
