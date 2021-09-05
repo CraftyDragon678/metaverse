@@ -44,7 +44,7 @@ class MetaversePlugin: JavaPlugin(), Listener {
 
     @EventHandler
     fun onPlayerPreJoin(e: AsyncPlayerPreLoginEvent) {
-        e.playerProfile.setProperty(Metaverse.joinSkin.makeProperty())
+        e.playerProfile.setProperty(Metaverse.joinSkin.profileProperty)
     }
 
     @EventHandler
