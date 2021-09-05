@@ -14,15 +14,18 @@ allprojects {
 
 subprojects {
     apply(plugin="org.jetbrains.kotlin.jvm")
+    repositories {
+        maven("https://repo.dmulloy2.net/repository/public/")
+    }
     dependencies {
-        compileOnly("io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT")
+        compileOnly("io.papermc.paper:paper:1.17.1-R0.1-SNAPSHOT")
+        compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0")
 
         implementation(kotlin("stdlib"))
         implementation("io.github.monun:tap-api:4.1.2")
         implementation("io.github.monun:kommand-api:2.6.5")
     }
 }
-
 
 tasks {
     val mavenLocal = File("${System.getProperty("user.home")}/.m2/repository/")
