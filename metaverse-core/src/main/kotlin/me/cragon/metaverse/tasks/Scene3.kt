@@ -1,14 +1,9 @@
 package me.cragon.metaverse.tasks
 
 import me.cragon.metaverse.Metaverse
-import me.cragon.metaverse.internal.FakePlayer
+import me.cragon.metaverse.internal.FakeEntity
 import me.cragon.metaverse.internal.MetaverseSkin
-import net.minecraft.network.protocol.game.PacketPlayOutEntity
-import net.minecraft.network.protocol.game.PacketPlayOutEntityHeadRotation
-import net.minecraft.network.protocol.game.PacketPlayOutNamedEntitySpawn
-import net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo
 import org.bukkit.Location
-import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer
 
 class Scene3 : TaskBase() {
     override fun run() {
@@ -25,7 +20,7 @@ class Scene3 : TaskBase() {
                     Location(Metaverse.mainWorld, -390.37, 22.00, 293.40, -271.53f, -13.65f),
                     Location(Metaverse.mainWorld, -390.42, 22.00, 289.52, -271.53f, -13.65f),
                 ).forEach { location ->
-                    val npc = FakePlayer.spawnFakePlayer("관리", location, MetaverseSkin.COURTIER)
+                    val npc = FakeEntity.spawnFakePlayer("관리", location, MetaverseSkin.COURTIER)
                     npcs += npc
                 }
 

@@ -11,6 +11,7 @@ import net.minecraft.network.protocol.game.PacketPlayOutEntityHeadRotation
 import net.minecraft.network.protocol.game.PacketPlayOutNamedEntitySpawn
 import net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo
 import net.minecraft.server.level.EntityPlayer
+import net.minecraft.world.entity.decoration.EntityArmorStand
 import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer
 import org.bukkit.scheduler.BukkitRunnable
@@ -20,7 +21,7 @@ abstract class TaskBase: BukkitRunnable() {
     protected val runAllPlayers = Bukkit.getOnlinePlayers()::forEach
 
     protected val npcs = mutableListOf<EntityPlayer>()
-    protected val armorStands = mutableListOf<FakeEntity>()
+    protected val armorStands = mutableListOf<EntityArmorStand>()
 
     protected var tick = -1
 
@@ -47,10 +48,10 @@ abstract class TaskBase: BukkitRunnable() {
                 connection.sendPacket(PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.e, npc))
                 connection.sendPacket(PacketPlayOutEntityDestroy(npc.id))
             }
+            armorStands.forEach { armorStand ->
+                connection.sendPacket(PacketPlayOutEntityDestroy(armorStand.id))
+            }
             it.hideBossBar(bossBar)
-        }
-        armorStands.forEach {
-            it.remove()
         }
 
         super.cancel()
@@ -61,9 +62,6 @@ abstract class TaskBase: BukkitRunnable() {
             PacketContainer(PacketType.Play.Server.PLAYER_INFO)
             val connection = (it as CraftPlayer).handle.b
             npcs.forEach { npc ->
-                connection.sendPacket(PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.a,
-                    npc))
-                connection.sendPacket(PacketPlayOutNamedEntitySpawn(npc))
                 connection.sendPacket(PacketPlayOutEntityHeadRotation(npc,
                     ((npc.yRot * 256) / 360).toInt().toByte()))
                 connection.sendPacket(PacketPlayOutEntity.PacketPlayOutEntityLook(npc.id,

@@ -1,16 +1,20 @@
 package me.cragon.metaverse.tasks
 
 import me.cragon.metaverse.Metaverse
-import me.cragon.metaverse.internal.FakePlayer
+import me.cragon.metaverse.internal.FakeEntity
 import me.cragon.metaverse.internal.MetaverseSkin
-import net.minecraft.network.protocol.game.PacketPlayOutEntity
-import net.minecraft.network.protocol.game.PacketPlayOutEntityHeadRotation
+import net.minecraft.network.protocol.game.PacketPlayOutMount
 import net.minecraft.network.protocol.game.PacketPlayOutNamedEntitySpawn
 import net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo
+import net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLiving
 import org.bukkit.Location
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftArmorStand
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
+import org.bukkit.event.player.PlayerInteractEvent
 
-class Scene5 : TaskBase() {
+class Scene5 : TaskBase(), Listener {
     override fun run() {
         super.run()
         when (tick) {
@@ -26,11 +30,43 @@ class Scene5 : TaskBase() {
                     Location(Metaverse.mainWorld, -486.99, 23.50, 614.53, -268.98f, -1.35f),
                     Location(Metaverse.mainWorld, -486.97, 23.50, 611.64, -269.43f, -1.05f),
                 ).forEach { location ->
-                    val npc = FakePlayer.spawnFakePlayer("관리", location, MetaverseSkin.COURTIER)
-                    npcs += npc
+                    armorStands += FakeEntity.spawnFakeArmorStand(location.clone().apply { y -= 1.8 }).apply {
+                        isInvisible = true
+                    }.also { armorStand ->
+                        npcs += FakeEntity.spawnFakePlayer("관리", location, MetaverseSkin.COURTIER).apply {
+                            startRiding((armorStand.bukkitEntity as CraftArmorStand).handle)
+                        }
+                    }
                 }
 
+                runAllPlayers { player ->
+                    val connection = (player as CraftPlayer).handle.b
+                    (0..8).forEach { index ->
+                        connection.sendPacket(PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.a,
+                            npcs[index]))
+                        connection.sendPacket(PacketPlayOutNamedEntitySpawn(npcs[index]))
+                        connection.sendPacket(PacketPlayOutSpawnEntityLiving(armorStands[index]))
+                        connection.sendPacket(PacketPlayOutMount((armorStands[index].bukkitEntity as CraftArmorStand).handle))
+                    }
+                }
                 updateNpc()
+            }
+        }
+    }
+
+    private val playerSeatLocation = Location(Metaverse.mainWorld, -492.92, 21.70, 627.54)
+
+    @EventHandler
+    fun onPlayerInteract(e: PlayerInteractEvent) {
+        if (e.player.location.distance(playerSeatLocation) < 1) {
+            armorStands += FakeEntity.spawnFakeArmorStand(playerSeatLocation).apply {
+                isInvisible = true
+            }.also { armorStand ->
+                (e.player as CraftPlayer).handle.startRiding(armorStand)
+                runAllPlayers { player ->
+                    val connection = (player as CraftPlayer).handle.b
+                    connection.sendPacket(PacketPlayOutMount((armorStand.bukkitEntity as CraftArmorStand).handle))
+                }
             }
         }
     }
