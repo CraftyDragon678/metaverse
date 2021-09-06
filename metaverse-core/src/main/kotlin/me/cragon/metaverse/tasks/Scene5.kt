@@ -3,6 +3,8 @@ package me.cragon.metaverse.tasks
 import me.cragon.metaverse.Metaverse
 import me.cragon.metaverse.internal.FakeEntity
 import me.cragon.metaverse.internal.MetaverseSkin
+import net.minecraft.network.protocol.game.PacketPlayOutEntityDestroy
+import net.minecraft.network.protocol.game.PacketPlayOutEntityMetadata
 import net.minecraft.network.protocol.game.PacketPlayOutMount
 import net.minecraft.network.protocol.game.PacketPlayOutNamedEntitySpawn
 import net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo
@@ -10,6 +12,7 @@ import net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLiving
 import org.bukkit.Location
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftArmorStand
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerInteractEvent
@@ -31,7 +34,7 @@ class Scene5 : TaskBase(), Listener {
                     Location(Metaverse.mainWorld, -486.97, 23.50, 611.64, -269.43f, -1.05f),
                 ).forEach { location ->
                     armorStands += FakeEntity.spawnFakeArmorStand(location.clone().apply { y -= 1.8 }).apply {
-                        isInvisible = true
+                        (bukkitEntity as CraftArmorStand).isInvisible = true
                     }.also { armorStand ->
                         npcs += FakeEntity.spawnFakePlayer("관리", location, MetaverseSkin.COURTIER).apply {
                             startRiding((armorStand.bukkitEntity as CraftArmorStand).handle)
@@ -46,7 +49,8 @@ class Scene5 : TaskBase(), Listener {
                             npcs[index]))
                         connection.sendPacket(PacketPlayOutNamedEntitySpawn(npcs[index]))
                         connection.sendPacket(PacketPlayOutSpawnEntityLiving(armorStands[index]))
-                        connection.sendPacket(PacketPlayOutMount((armorStands[index].bukkitEntity as CraftArmorStand).handle))
+                        connection.sendPacket(PacketPlayOutMount(armorStands[index].bukkitEntity.handle))
+                        connection.sendPacket(PacketPlayOutEntityMetadata(armorStands[index].id, armorStands[index].bukkitEntity.handle.dataWatcher, false))
                     }
                 }
                 updateNpc()
@@ -58,16 +62,45 @@ class Scene5 : TaskBase(), Listener {
 
     @EventHandler
     fun onPlayerInteract(e: PlayerInteractEvent) {
-        if (e.player.location.distance(playerSeatLocation) < 1) {
-            armorStands += FakeEntity.spawnFakeArmorStand(playerSeatLocation).apply {
-                isInvisible = true
-            }.also { armorStand ->
-                (e.player as CraftPlayer).handle.startRiding(armorStand)
-                runAllPlayers { player ->
-                    val connection = (player as CraftPlayer).handle.b
-                    connection.sendPacket(PacketPlayOutMount((armorStand.bukkitEntity as CraftArmorStand).handle))
-                }
+        if (e.player.location.distance(playerSeatLocation) < 3) {
+            e.isCancelled = true
+            if (e.player.isInsideVehicle) {
+                exitArmorStand(e.player)
+            } else {
+                enterArmorStand(e.player)
             }
         }
+    }
+
+    private fun exitArmorStand(player: Player) {
+        player.vehicle?.let {
+            val armorStand = it as CraftArmorStand
+            armorStands -= armorStand.handle
+            (player as CraftPlayer).handle.stopRiding()
+            runAllPlayers { player ->
+                val connection = (player as CraftPlayer).handle.b
+                connection.sendPacket(PacketPlayOutMount(armorStand.handle))
+                connection.sendPacket(PacketPlayOutEntityDestroy(armorStand.handle.id))
+            }
+        }
+    }
+
+    private fun enterArmorStand(player: Player) {
+        armorStands += FakeEntity.spawnFakeArmorStand(playerSeatLocation).apply {
+            (bukkitEntity as CraftArmorStand).isInvisible = true
+        }.also { armorStand ->
+            (player as CraftPlayer).handle.startRiding(armorStand)
+            runAllPlayers { player ->
+                val connection = (player as CraftPlayer).handle.b
+                connection.sendPacket(PacketPlayOutSpawnEntityLiving(armorStand))
+                connection.sendPacket(PacketPlayOutMount(armorStand.bukkitEntity.handle))
+                connection.sendPacket(PacketPlayOutEntityMetadata(armorStand.id, armorStand.bukkitEntity.handle.dataWatcher, false))
+            }
+        }
+    }
+
+    override fun cancel() {
+        super.cancel()
+        PlayerInteractEvent.getHandlerList().unregister(this)
     }
 }
