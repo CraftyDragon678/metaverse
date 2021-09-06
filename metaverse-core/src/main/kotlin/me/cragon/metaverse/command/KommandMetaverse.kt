@@ -107,7 +107,10 @@ class KommandMetaverse {
     private fun KommandSource.teleport(sceneNumber: Int) {
         TaskBase.getScene(sceneNumber)?.getDeclaredConstructor()?.newInstance()?.let {
             player.teleport(it.mainLocation)
+            feedback(Component.text().content("Proof!").color(NamedTextColor.LIGHT_PURPLE))
+            return
         }
-        feedback(Component.text().content("Proof!").color(NamedTextColor.LIGHT_PURPLE))
+        feedback(Component.text().content("can't find scene")
+            .color(NamedTextColor.RED).decorate(TextDecoration.ITALIC))
     }
 }
