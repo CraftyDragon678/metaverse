@@ -1,13 +1,12 @@
 package me.cragon.metaverse.tasks
 
+import com.comphenix.protocol.events.PacketContainer
 import me.cragon.metaverse.Metaverse
 import me.cragon.metaverse.internal.FakeEntity
 import me.cragon.metaverse.internal.MetaverseSkin
 import net.minecraft.network.protocol.game.PacketPlayOutEntityDestroy
 import net.minecraft.network.protocol.game.PacketPlayOutEntityMetadata
 import net.minecraft.network.protocol.game.PacketPlayOutMount
-import net.minecraft.network.protocol.game.PacketPlayOutNamedEntitySpawn
-import net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo
 import net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLiving
 import org.bukkit.Location
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftArmorStand
@@ -44,16 +43,18 @@ class Scene5 : TaskBase(), Listener {
                     }
                 }
 
-                runAllPlayers { player ->
-                    val connection = (player as CraftPlayer).handle.b
-                    (0..8).forEach { index ->
-                        connection.sendPacket(PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.a,
-                            npcs[index]))
-                        connection.sendPacket(PacketPlayOutNamedEntitySpawn(npcs[index]))
-                        connection.sendPacket(PacketPlayOutSpawnEntityLiving(armorStands[index]))
-                        connection.sendPacket(PacketPlayOutMount(armorStands[index].bukkitEntity.handle))
-                        connection.sendPacket(PacketPlayOutEntityMetadata(armorStands[index].id, armorStands[index].bukkitEntity.handle.dataWatcher, false))
-                    }
+                spawnNpcs(npcs)
+                (0..8).forEach { index ->
+                    Metaverse.protocolManager.broadcastServerPacket(PacketContainer.fromPacket(
+                        PacketPlayOutSpawnEntityLiving(armorStands[index])))
+                    Metaverse.protocolManager.broadcastServerPacket(PacketContainer.fromPacket(
+                        PacketPlayOutMount(armorStands[index].bukkitEntity.handle)))
+                    Metaverse.protocolManager.broadcastServerPacket(PacketContainer.fromPacket(
+                        PacketPlayOutEntityMetadata(
+                            armorStands[index].id,
+                            armorStands[index].bukkitEntity.handle.dataWatcher,
+                            false)
+                    ))
                 }
                 updateNpc()
             }

@@ -24,6 +24,7 @@ class Scene16 : TaskBase() {
                     npcs += npc
                 }
 
+                spawnNpcs(npcs)
                 updateNpc()
             }
         }

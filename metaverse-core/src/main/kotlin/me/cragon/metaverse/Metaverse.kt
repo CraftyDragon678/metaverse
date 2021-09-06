@@ -1,5 +1,7 @@
 package me.cragon.metaverse
 
+import com.comphenix.protocol.ProtocolLibrary
+import com.comphenix.protocol.ProtocolManager
 import io.github.monun.tap.fake.FakeEntityServer
 import io.github.monun.tap.fake.FakeProjectileManager
 import me.cragon.metaverse.internal.MetaverseSkin
@@ -23,12 +25,15 @@ object Metaverse {
 
     lateinit var joinSkin: MetaverseSkin
 
+    lateinit var protocolManager: ProtocolManager
+
     internal fun initialize(plugin: MetaversePlugin, fakeEntityServer: FakeEntityServer, fakeProjectileManager: FakeProjectileManager) {
         this.plugin = plugin
         this.fakeEntityServer = fakeEntityServer
         this.fakeProjectileManager = fakeProjectileManager
         mainWorld = Bukkit.getWorlds().first()
         joinSkin = MetaverseSkin.ME
+        protocolManager = ProtocolLibrary.getProtocolManager()
     }
 
     private var task: TaskBase? = null

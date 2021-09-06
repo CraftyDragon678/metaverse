@@ -24,7 +24,7 @@ class Scene3 : TaskBase() {
                     val npc = FakeEntity.spawnFakePlayer("관리", location, MetaverseSkin.COURTIER)
                     npcs += npc
                 }
-
+                spawnNpcs(npcs)
                 updateNpc()
             }
         }
