@@ -7,6 +7,7 @@ import me.cragon.metaverse.plugin.MetaversePlugin
 import me.cragon.metaverse.tasks.TaskBase
 import org.bukkit.Bukkit
 import org.bukkit.World
+import org.bukkit.event.Listener
 
 object Metaverse {
     lateinit var plugin: MetaversePlugin
@@ -36,6 +37,9 @@ object Metaverse {
         if (this.task != null) return false
         this.task = task
         task.runTaskTimer(plugin, 0L, 1L)
+        if (task is Listener) {
+            Bukkit.getPluginManager().registerEvents(task, plugin)
+        }
         return true
     }
 
