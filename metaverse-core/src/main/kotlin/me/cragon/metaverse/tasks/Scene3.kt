@@ -6,6 +6,7 @@ import me.cragon.metaverse.internal.MetaverseSkin
 import org.bukkit.Location
 
 class Scene3 : TaskBase() {
+    override val mainLocation = Location(Metaverse.mainWorld, -406.97, 22.00, 289.27, -88.83f, -4.65f)
     override fun run() {
         super.run()
         when (tick) {

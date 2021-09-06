@@ -13,6 +13,7 @@ import net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo
 import net.minecraft.server.level.EntityPlayer
 import net.minecraft.world.entity.decoration.EntityArmorStand
 import org.bukkit.Bukkit
+import org.bukkit.Location
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer
 import org.bukkit.scheduler.BukkitRunnable
 
@@ -24,6 +25,8 @@ abstract class TaskBase: BukkitRunnable() {
     protected val armorStands = mutableListOf<EntityArmorStand>()
 
     protected var tick = -1
+
+    abstract val mainLocation: Location
 
     override fun run() {
         tick++

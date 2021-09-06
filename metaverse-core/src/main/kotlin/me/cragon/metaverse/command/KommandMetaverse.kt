@@ -52,6 +52,20 @@ class KommandMetaverse {
                         .append(Component.text(MetaverseSkin.values().joinToString(", ")).color(NamedTextColor.GREEN)))
                 }
             }
+            then("teleport") {
+                then("sceneNumber" to int(1)) {
+                    requires {
+                        playerOrNull != null
+                    }
+                    executes {
+                        val sceneNumber: Int by it
+                        teleport(sceneNumber)
+                    }
+                }
+                executes {
+                    feedback(Component.text("Please specify scene number").color(NamedTextColor.RED))
+                }
+            }
         }
     }
 
@@ -88,5 +102,12 @@ class KommandMetaverse {
         Metaverse.joinSkin = skin
         feedback(Component.text().content("join skin is set: ")
             .append(Component.text().content(skin.name).color(NamedTextColor.GREEN)))
+    }
+
+    private fun KommandSource.teleport(sceneNumber: Int) {
+        TaskBase.getScene(sceneNumber)?.getDeclaredConstructor()?.newInstance()?.let {
+            player.teleport(it.mainLocation)
+        }
+        feedback(Component.text().content("Proof!").color(NamedTextColor.LIGHT_PURPLE))
     }
 }
