@@ -26,7 +26,6 @@ class Scene27 : TaskBase() {
                 Metaverse.protocolManager.broadcastServerPacket(PacketContainer.fromPacket(
                     PacketPlayOutEntity.PacketPlayOutRelEntityMove(npcs.first().id, 0, 0, -500, true)
                 ))
-                Short.MIN_VALUE
             }
         }
     }

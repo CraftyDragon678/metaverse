@@ -8,17 +8,23 @@ import com.comphenix.protocol.wrappers.WrappedChatComponent
 import com.comphenix.protocol.wrappers.WrappedGameProfile
 import io.github.monun.tap.fake.FakeEntity
 import me.cragon.metaverse.Metaverse
+import me.cragon.metaverse.internal.MetaverseSkin
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.text.Component
 import net.minecraft.network.protocol.game.PacketPlayOutEntity
 import net.minecraft.network.protocol.game.PacketPlayOutEntityDestroy
 import net.minecraft.network.protocol.game.PacketPlayOutEntityHeadRotation
+import net.minecraft.network.protocol.game.PacketPlayOutEntityMetadata
+import net.minecraft.network.protocol.game.PacketPlayOutMount
 import net.minecraft.network.protocol.game.PacketPlayOutNamedEntitySpawn
 import net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo
+import net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLiving
 import net.minecraft.server.level.EntityPlayer
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.decoration.EntityArmorStand
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftArmorStand
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer
 import org.bukkit.scheduler.BukkitRunnable
 import java.util.*
@@ -51,16 +57,8 @@ abstract class TaskBase: BukkitRunnable() {
     }
 
     override fun cancel() {
+        despawnAllNpcs()
         runAllPlayers {
-            val connection = (it as CraftPlayer).handle.b
-
-            npcs.forEach { npc ->
-                connection.sendPacket(PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.e, npc))
-                connection.sendPacket(PacketPlayOutEntityDestroy(npc.id))
-            }
-            armorStands.forEach { armorStand ->
-                connection.sendPacket(PacketPlayOutEntityDestroy(armorStand.id))
-            }
             it.hideBossBar(bossBar)
         }
 
@@ -93,6 +91,74 @@ abstract class TaskBase: BukkitRunnable() {
         npcs.map { npc ->
             Metaverse.protocolManager.broadcastServerPacket(PacketContainer.fromPacket(PacketPlayOutNamedEntitySpawn(npc)))
         }
+    }
+
+    protected fun spawnArmorStands(armorStands: List<EntityArmorStand>) {
+        armorStands.forEach { armorStand ->
+            Metaverse.protocolManager.broadcastServerPacket(PacketContainer.fromPacket(
+                PacketPlayOutSpawnEntityLiving(armorStand)))
+            Metaverse.protocolManager.broadcastServerPacket(PacketContainer.fromPacket(
+                PacketPlayOutMount(armorStand.bukkitEntity.handle)))
+            Metaverse.protocolManager.broadcastServerPacket(PacketContainer.fromPacket(
+                PacketPlayOutEntityMetadata(
+                    armorStand.id,
+                    armorStand.bukkitEntity.handle.dataWatcher,
+                    false)
+            ))
+        }
+    }
+
+    protected fun spawnNpcsInLocations(locations: List<Location>, name: String, skin: MetaverseSkin, isSeated: Boolean = false) {
+        val startArmorStandIndex = armorStands.size
+        val startNpcIndex = npcs.size
+        locations.forEach { location ->
+            if (isSeated) {
+                armorStands += me.cragon.metaverse.internal.FakeEntity.spawnFakeArmorStand(location.clone().apply { y -= 1.8 }).apply {
+                    (bukkitEntity as CraftArmorStand).isInvisible = true
+                }.also { armorStand ->
+                    npcs += me.cragon.metaverse.internal.FakeEntity.spawnFakePlayer(name, location, skin).apply {
+                        startRiding((armorStand.bukkitEntity as CraftArmorStand).handle)
+                    }
+                }
+            } else {
+                npcs += me.cragon.metaverse.internal.FakeEntity.spawnFakePlayer(name, location, skin)
+            }
+        }
+
+        spawnNpcs(npcs.drop(startNpcIndex))
+        if (isSeated) {
+            spawnArmorStands(armorStands.drop(startArmorStandIndex))
+        }
+        updateNpc()
+    }
+
+    protected fun despawnNpcs(npcs: List<EntityPlayer>) {
+        npcs.forEach { npc ->
+            Metaverse.protocolManager.broadcastServerPacket(PacketContainer.fromPacket(
+                PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.e, npc)
+            ))
+            Metaverse.protocolManager.broadcastServerPacket(PacketContainer.fromPacket(
+                PacketPlayOutEntityDestroy(npc.id)
+            ))
+        }
+        this.npcs -= npcs
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    protected fun despawnEntities(entities: List<Entity>) {
+        entities.forEach { entity ->
+            Metaverse.protocolManager.broadcastServerPacket(PacketContainer.fromPacket(
+                PacketPlayOutEntityDestroy(entity.id)
+            ))
+        }
+        if (entities.all { it is EntityArmorStand }) {
+            this.armorStands -= entities as List<EntityArmorStand>
+        }
+    }
+
+    protected fun despawnAllNpcs() {
+        despawnNpcs(npcs)
+        despawnEntities(armorStands)
     }
 
     companion object {

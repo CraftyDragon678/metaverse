@@ -18,8 +18,8 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerInteractEvent
 
-class Scene7 : TaskBase(), Listener {
-    override val mainLocation = Location(Metaverse.mainWorld, -397.50, 22.00, 286.50, 361.20f, 10.50f)
+class Scene11 : TaskBase(), Listener {
+    override val mainLocation = Location(Metaverse.mainWorld, -490.02, 23.00, 629.92, 179.52f, 29.31f)
 
     override fun run() {
         super.run()
@@ -27,24 +27,23 @@ class Scene7 : TaskBase(), Listener {
             0 -> {
                 spawnNpcsInLocations(
                     listOf(
-                        Location(Metaverse.mainWorld, -397.50, 22.00, 286.50, 361.20f, 10.50f),
-                        Location(Metaverse.mainWorld, -397.50, 22.00, 296.50, -1.80f, -5.40f),
-                        Location(Metaverse.mainWorld, -394.50, 22.00, 296.50, -5.10f, -2.10f),
-                        Location(Metaverse.mainWorld, -394.51, 22.00, 286.50, 0.15f, 1.50f),
+                        Location(Metaverse.mainWorld, -490.02, 23.00, 629.92, 179.52f, 29.31f),
+                    ),
+                    "대사헌",
+                    MetaverseSkin.COURTIER
+                )
+                spawnNpcsInLocations(
+                    listOf(
+                        Location(Metaverse.mainWorld, -487.19, 23.00, 624.23, 32.07f, 36.51f),
+                        Location(Metaverse.mainWorld, -486.75, 23.00, 620.79, 29.07f, 28.41f),
+                        Location(Metaverse.mainWorld, -486.88, 23.00, 616.93, 28.62f, 30.81f),
+                        Location(Metaverse.mainWorld, -492.79, 23.00, 625.04, -23.43f, 29.76f),
+                        Location(Metaverse.mainWorld, -492.86, 23.00, 621.83, -21.63f, 40.86f),
+                        Location(Metaverse.mainWorld, -492.78, 23.00, 617.70, -22.68f, 35.16f),
                     ),
                     "관리",
                     MetaverseSkin.COURTIER
                 )
-            }
-            in 0..20*30 step 20 -> {
-                Bukkit.getPlayer("CraftyDragon678")?.performCommand("/move 1 s -es")
-            }
-            in 20..Int.MAX_VALUE -> {
-                npcs.forEach { npc ->
-                    Metaverse.protocolManager.broadcastServerPacket(PacketContainer.fromPacket(
-                        PacketPlayOutEntity.PacketPlayOutRelEntityMove(npc.id, 0, 0, (4096 / 19).toShort(), true)
-                    ))
-                }
             }
         }
     }
