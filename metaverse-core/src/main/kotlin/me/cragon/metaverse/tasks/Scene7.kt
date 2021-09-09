@@ -17,7 +17,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerInteractEvent
 
-class Scene5 : TaskBase(), Listener {
+class Scene7 : TaskBase(), Listener {
     override val mainLocation = Location(Metaverse.mainWorld, -493.09, 23.50, 611.56, -90.03f, 3.96f)
 
     override fun run() {

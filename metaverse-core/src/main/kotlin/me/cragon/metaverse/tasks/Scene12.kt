@@ -17,52 +17,11 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerInteractEvent
 
-class Scene5 : TaskBase(), Listener {
+class Scene12 : TaskBase(), Listener {
     override val mainLocation = Location(Metaverse.mainWorld, -493.09, 23.50, 611.56, -90.03f, 3.96f)
 
-    override fun run() {
-        super.run()
-        when (tick) {
-            0 -> {
-                listOf(
-                    Location(Metaverse.mainWorld, -493.09, 23.50, 611.56, -90.03f, 3.96f),
-                    Location(Metaverse.mainWorld, -492.93, 23.50, 615.52, -90.33f, 1.80f),
-                    Location(Metaverse.mainWorld, -492.90, 23.50, 619.65, -91.08f, 0.60f),
-                    Location(Metaverse.mainWorld, -493.01, 23.50, 623.55, -90.03f, 1.20f),
-                    Location(Metaverse.mainWorld, -486.90, 23.50, 626.37, -270.78f, 1.80f),
-                    Location(Metaverse.mainWorld, -486.92, 23.50, 622.45, -270.78f, 1.95f),
-                    Location(Metaverse.mainWorld, -487.00, 23.50, 618.00, -269.58f, -2.10f),
-                    Location(Metaverse.mainWorld, -486.99, 23.50, 614.53, -268.98f, -1.35f),
-                    Location(Metaverse.mainWorld, -486.97, 23.50, 611.64, -269.43f, -1.05f),
-                ).forEach { location ->
-                    armorStands += FakeEntity.spawnFakeArmorStand(location.clone().apply { y -= 1.8 }).apply {
-                        (bukkitEntity as CraftArmorStand).isInvisible = true
-                    }.also { armorStand ->
-                        npcs += FakeEntity.spawnFakePlayer("관리", location, MetaverseSkin.COURTIER).apply {
-                            startRiding((armorStand.bukkitEntity as CraftArmorStand).handle)
-                        }
-                    }
-                }
-
-                spawnNpcs(npcs)
-                (0..8).forEach { index ->
-                    Metaverse.protocolManager.broadcastServerPacket(PacketContainer.fromPacket(
-                        PacketPlayOutSpawnEntityLiving(armorStands[index])))
-                    Metaverse.protocolManager.broadcastServerPacket(PacketContainer.fromPacket(
-                        PacketPlayOutMount(armorStands[index].bukkitEntity.handle)))
-                    Metaverse.protocolManager.broadcastServerPacket(PacketContainer.fromPacket(
-                        PacketPlayOutEntityMetadata(
-                            armorStands[index].id,
-                            armorStands[index].bukkitEntity.handle.dataWatcher,
-                            false)
-                    ))
-                }
-                updateNpc()
-            }
-        }
-    }
-
-    private val playerSeatLocation = Location(Metaverse.mainWorld, -492.92, 21.70, 627.54)
+    private val playerSeatLocation = Location(Metaverse.mainWorld, -547.99, 21.70, 623.49)
+    private val playerSeatLocation2 = Location(Metaverse.mainWorld, -547.83, 21.70, 619.44)
 
     @EventHandler
     fun onPlayerInteract(e: PlayerInteractEvent) {
@@ -71,7 +30,14 @@ class Scene5 : TaskBase(), Listener {
             if (e.player.isInsideVehicle) {
                 exitArmorStand(e.player)
             } else {
-                enterArmorStand(e.player)
+                enterArmorStand(e.player, playerSeatLocation)
+            }
+        } else if (e.player.location.distance(playerSeatLocation2) < 3) {
+            e.isCancelled = true
+            if (e.player.isInsideVehicle) {
+                exitArmorStand(e.player)
+            } else {
+                enterArmorStand(e.player, playerSeatLocation2)
             }
         }
     }
@@ -89,8 +55,8 @@ class Scene5 : TaskBase(), Listener {
         }
     }
 
-    private fun enterArmorStand(player: Player) {
-        armorStands += FakeEntity.spawnFakeArmorStand(playerSeatLocation).apply {
+    private fun enterArmorStand(player: Player, location: Location) {
+        armorStands += FakeEntity.spawnFakeArmorStand(location).apply {
             (bukkitEntity as CraftArmorStand).isInvisible = true
         }.also { armorStand ->
             (player as CraftPlayer).handle.startRiding(armorStand)
